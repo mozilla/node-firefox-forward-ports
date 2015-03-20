@@ -42,6 +42,18 @@ var forwardPorts = require('node-firefox-forward-ports');
 
 // Forwards ports as necessary, while reusing existing ports.
 // Returns the list of devices annotated with details on forwarded ports.
+forwardPorts([
+  {id: '3739ced5'},
+  {id: 'full_keon'},
+  {id: 'full_unagi'}
+]).then(function(results) {
+  console.log(results);
+}).catch(function(err) {
+  console.error(err);
+});
+
+// forwardPorts() can also accept an options object, for future expansion
+// when additional options are supported.
 forwardPorts({
   devices: [
     {id: '3739ced5'},
@@ -53,6 +65,7 @@ forwardPorts({
 }).catch(function(err) {
   console.error(err);
 });
+
 ```
 
 ## Example
@@ -66,11 +79,7 @@ option.
 var findDevices = require('node-firefox-find-devices');
 var forwardPorts = require('node-firefox-forward-ports');
 
-findDevices().then(function (devices) {
-  return forwardPorts({
-    devices: devices
-  });
-}).then(function(results) {
+findDevices().then(forwardPorts).then(function(results) {
   console.log(results);
 });
 ```

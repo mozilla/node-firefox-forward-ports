@@ -32,15 +32,21 @@ module.exports = {
     });
   },
 
-  // Note: These two tests are mostly identical, except for whether forwarded
+  // Note: These tests are mostly identical, except for whether forwarded
   // ports already exist. In either case, whether ports are quietly reused or
   // new ones forwarded, the end result returned to the developer is the same.
 
-  'forwardPorts() should forward a port for a device not yet forwarded':
-    commonForwardTest(false),
+  'forwardPorts({ devices: devices }) should forward a port for a device not yet forwarded':
+    commonForwardTest(false, true),
 
-  'forwardPorts() should skip forwarding for devices that have forwarded ports':
-    commonForwardTest(true),
+  'forwardPorts({ devices: devices }) should skip forwarding for devices that have forwarded ports':
+    commonForwardTest(true, true),
+
+  'forwardPorts(devices) should forward a port for a device not yet forwarded':
+    commonForwardTest(false, false),
+
+  'forwardPorts(devices) should skip forwarding for devices that have forwarded ports':
+    commonForwardTest(true, false),
 
   tearDown: function(done) {
     mockery.disable();
@@ -49,7 +55,7 @@ module.exports = {
 
 };
 
-function commonForwardTest(detectForwardedPorts) {
+function commonForwardTest(detectForwardedPorts, useOptions) {
   return function(test) {
 
     var port = 9999;
@@ -134,9 +140,14 @@ function commonForwardTest(detectForwardedPorts) {
     });
 
     // Require a freshly imported forwardPorts for this test
-    require('../../index')({
-      devices: devices
-    }).catch(function(err) {
+    var forwardPortsWithMocks = require('../../index');
+
+    // forwardPorts() can accept a simple device list, or a full options object.
+    var forwardPortsPromise = (useOptions) ?
+      forwardPortsWithMocks({ devices: devices }) :
+      forwardPortsWithMocks(devices);
+
+    forwardPortsPromise.catch(function(err) {
       test.ifError(err);
       test.done();
     }).then(function(results) {

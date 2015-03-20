@@ -11,8 +11,15 @@ var REMOTE_DEBUGGER_SOCKET = 'localfilesystem:/data/local/debugger-socket';
 module.exports = forwardPorts;
 
 function forwardPorts(options) {
-  options = options || {};
-  var devices = options.devices;
+
+  var devices;
+
+  if (Array.isArray(options)) {
+    devices = options;
+  } else {
+    options = options || {};
+    devices = options.devices;
+  }
 
   var adbClient = adb.createClient();
 
